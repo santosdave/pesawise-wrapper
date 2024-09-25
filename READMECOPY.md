@@ -33,15 +33,25 @@ PESAWISE_DEFAULT_BALANCE_ID=your_default_balance_id
 
 You can use the Pesawise facade or inject the Pesawise class into your controllers/services.
 
+### Using the Facade
+
 ```php
 use Santosdave\PesawiseWrapper\Facades\Pesawise;
 
-// Or inject in your constructor
-use Santosdave\PesawiseWrapper\Pesawise;
-
-public function __construct(Pesawise $pesawise)
+class PaymentController extends Controller
 {
-    $this->pesawise = $pesawise;
+    public function processPayment()
+    {
+        $payment = Pesawise::createDirectPayment([
+            'amount' => 1000,
+            'currency' => 'KES',
+            'reference' => 'INV-001',
+            'recipient' => 'John Doe',
+            // ... other payment details
+        ]);
+
+        // Handle the payment response
+    }
 }
 ```
 
@@ -65,7 +75,6 @@ class PaymentService
     }
 }
 ```
-
 
 ### Available Methods
 
@@ -176,16 +185,3 @@ If you discover any security related issues, please email the author instead of 
 ## License
 
 The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
-
-pesawise-wrapper/
-├── src/
-│   ├── Exceptions/
-│   │   └── PesawiseException.php
-│   ├── Traits/
-│   │   └── ValidationTrait.php
-│   ├── Pesawise.php
-│   └── PesawiseProvider.php
-├── tests/
-│   ├── PesawiseProviderTest.php
-│   └── PesawiseTest.php
-└── composer.json

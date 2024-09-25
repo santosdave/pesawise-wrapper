@@ -17,35 +17,39 @@ class Pesawise
     public const PROD_HOST = "https://api.pesawise.com";
 
     private string $baseUrl;
-    private array $options;
+    private array $config;
     private Client $client;
 
-    public function __construct(array $options = [], Client $client = null)
+    public function __construct(array $config = [], Client $client = null)
     {
-        $this->validateOptions($options);
-        $this->setOptions($options);
+        $this->setConfig($config);
         $this->initializeClient($client);
     }
 
-    private function validateOptions(array $options): void
+    private function setConfig(array $config): void
     {
-        if (!isset($options['apiKey'])) {
-            throw new InvalidArgumentException('apiKey is required');
-        }
+        $this->config = array_merge([
+            'api_key' => null,
+            'api_secret' => null,
+            'environment' => 'sandbox',
+            'debug' => false,
+            'default_currency' => 'KES',
+            'default_balance_id' => null,
+        ], $config);
 
-        if (!isset($options['apiSecret'])) {
-            throw new InvalidArgumentException('apiSecret is required');
-        }
+        $this->validateConfig();
+        $this->baseUrl = $this->config['environment'] === 'sandbox' ? self::SANDBOX_HOST : self::PROD_HOST;
     }
 
-    private function setOptions(array $options): void
+    private function validateConfig(): void
     {
-        $this->options = array_merge([
-            'env' => 'sandbox',
-            'debug' => false,
-        ], $options);
+        if (!$this->config['api_key']) {
+            throw new InvalidArgumentException('API key is required');
+        }
 
-        $this->baseUrl = $this->options['env'] === 'sandbox' ? self::SANDBOX_HOST : self::PROD_HOST;
+        if (!$this->config['api_secret']) {
+            throw new InvalidArgumentException('API secret is required');
+        }
     }
 
     private function initializeClient(Client $client = null): void
@@ -55,13 +59,14 @@ class Pesawise
             'headers' => [
                 'Content-Type' => 'application/json',
                 'Accept' => 'application/json',
-                'api-key' => $this->options['apiKey'],
-                'api-secret' => $this->options['apiSecret'],
+                'api-key' => $this->config['api_key'],
+                'api-secret' => $this->config['api_secret'],
             ],
             'http_errors' => false,
-            'debug' => $this->options['debug'],
+            'debug' => $this->config['debug'],
         ]);
     }
+
 
     public function getAllSupportedBanks(): array
     {

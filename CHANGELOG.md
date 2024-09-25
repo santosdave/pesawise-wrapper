@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.3] - 2024-09-26
+
+### Changed
+- Updated PesawiseProvider to use the config file correctly
+- Modified Pesawise class to accept configuration options more flexibly
+- Updated README with clearer usage instructions and examples
+
+### Fixed
+- Inconsistency between README instructions and actual package implementation
+
 ## [1.0.2] - 2024-09-25
 
 ### Added
