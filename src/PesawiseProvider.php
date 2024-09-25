@@ -8,14 +8,19 @@ class PesawiseProvider extends ServiceProvider
 {
     public function boot()
     {
-        $this->publishes([
-            __DIR__ . '/../config/pesawise.php' => config_path('pesawise.php'),
-        ], 'config');
+        if ($this->app->runningInConsole()) {
+            $this->publishes([
+                __DIR__ . '/../config/pesawise.php' => config_path('pesawise.php'),
+            ], 'config');
+        }
     }
 
     public function register()
     {
-        $this->mergeConfigFrom(__DIR__ . '/../config/pesawise.php', 'pesawise');
+        $this->mergeConfigFrom(
+            __DIR__ . '/../config/pesawise.php',
+            'pesawise'
+        );
 
         $this->app->singleton('pesawise', function ($app) {
             return new Pesawise([
