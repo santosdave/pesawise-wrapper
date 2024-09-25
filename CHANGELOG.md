@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.1] - 2024-09-28
+
+### Added
+- New data type classes for improved type safety and code clarity:
+  - `TransferType`
+  - `Currency`
+  - `PaymentStatus`
+  - `BulkPayment`
+  - `CustomerData`
+
+### Changed
+- Updated `Pesawise` class to use new data type classes in its methods
+- Improved type hinting and return types in `Pesawise` class methods
+
 ## [1.2.0] - 2024-09-27
 
 ### Changed
