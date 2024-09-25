@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.1] - 2024-09-25
+
+### Changed
+- Updated composer.json to use stable versions of dependencies
+- Moved PHPUnit to require-dev section
+- Added support for multiple Laravel versions
+
 ## [1.0.0] - 2024-09-25
 
 ### Added
