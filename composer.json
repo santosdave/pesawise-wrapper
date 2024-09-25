@@ -1,0 +1,42 @@
+{
+  "name": "santosdave/pesawise-wrapper",
+  "description": "A Laravel package for integrating Pesawise payment gateway",
+  "type": "library",
+  "keywords": [
+    "santosdave",
+    "pesawise-wrapper",
+    "pesawise",
+    "payments"
+  ],
+  "require": {
+    "php": "^8.1",
+    "phpunit/phpunit": "10.5.x-dev",
+    "guzzlehttp/guzzle": "8.0.x-dev",
+    "orchestra/testbench": "8.x-dev",
+    "illuminate/support": "*"
+  },
+  "license": "MIT",
+  "autoload": {
+    "psr-4": {
+      "Santosdave\\PesawiseWrapper\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Santosdave\\PesawiseWrapper\\Tests\\": "tests/"
+    }
+  },
+  "scripts": {
+    "test": "vendor/bin/phpunit"
+  },
+  "authors": [
+    {
+      "name": "santosdave",
+      "email": "51959957+santosdave@users.noreply.github.com"
+    }
+  ],
+  "minimum-stability": "dev",
+  "prefer-stable": true
+}
+
+
