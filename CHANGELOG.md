@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.0] - 2024-09-27
+
+### Changed
+- Updated `Pesawise` class to always create a new Guzzle Client instance with correct configuration
+- Modified `getAllSupportedBanks` method to use POST request instead of GET
+- Improved error handling in `makeRequest` method
+
+### Fixed
+- Resolved issue with base URL not being properly set in Guzzle Client
+- Fixed potential configuration loading issues in different application setups
+
 ## [1.1.0] - 2024-09-26
 
 ### Changed

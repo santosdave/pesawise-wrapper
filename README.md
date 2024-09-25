@@ -136,7 +136,7 @@ $payment = Pesawise::createDirectPayment([
 ]);
 ```
 
-For more methods and detailed usage, refer to the [Pesawise API documentation](https://docs.pesawise.com/docs/).
+For more methods and detailed usage, refer to the [Pesawise API documentation](https://docs.pesawise.com/docs/home).
 
 ## Error Handling
 

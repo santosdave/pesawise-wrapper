@@ -20,10 +20,10 @@ class Pesawise
     private array $config;
     private Client $client;
 
-    public function __construct(array $config = [], Client $client = null)
+    public function __construct(array $config = [])
     {
         $this->setConfig($config);
-        $this->initializeClient($client);
+        $this->initializeClient();
     }
 
     private function setConfig(array $config): void
@@ -52,9 +52,9 @@ class Pesawise
         }
     }
 
-    private function initializeClient(Client $client = null): void
+    private function initializeClient(): void
     {
-        $this->client = $client ?? new Client([
+        $this->client = new Client([
             'base_uri' => $this->baseUrl,
             'headers' => [
                 'Content-Type' => 'application/json',
@@ -62,7 +62,7 @@ class Pesawise
                 'api-key' => $this->config['api_key'],
                 'api-secret' => $this->config['api_secret'],
             ],
-            'http_errors' => false,
+            'http_errors' => true,
             'debug' => $this->config['debug'],
         ]);
     }
@@ -70,7 +70,7 @@ class Pesawise
 
     public function getAllSupportedBanks(): array
     {
-        return $this->makeRequest('GET', '/api/payments/get-bank-info');
+        return $this->makeRequest('POST', '/api/payments/get-bank-info');
     }
 
     public function validateBankRecipient(array $data): array
@@ -198,7 +198,8 @@ class Pesawise
     {
         try {
             $options = $method === 'GET' ? ['query' => $data] : ['json' => $data];
-            $response = $this->client->request($method, $endpoint, $options);
+            $fullUrl = $this->baseUrl . $endpoint;
+            $response = $this->client->request($method, $fullUrl, $options);
 
             $statusCode = $response->getStatusCode();
             $body = json_decode($response->getBody()->getContents(), true);
