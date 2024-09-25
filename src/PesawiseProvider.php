@@ -24,7 +24,14 @@ class PesawiseProvider extends ServiceProvider
 
         $this->app->singleton('pesawise', function ($app) {
             $config = $app['config']['pesawise'];
-            return new Pesawise($config);
+            return new Pesawise([
+                'api_key' => $config['api_key'],
+                'api_secret' => $config['api_secret'],
+                'environment' => $config['environment'],
+                'debug' => $config['debug'],
+                'default_currency' => $config['default_currency'],
+                'default_balance_id' => $config['default_balance_id'],
+            ]);
         });
     }
 }

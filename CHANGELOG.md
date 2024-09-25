@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0] - 2024-09-26
+
+### Changed
+- Updated Pesawise class to directly access configuration using Laravel's config helper and environment variables
+- Removed dependency on PesawiseProvider for configuration
+- Improved flexibility in how the Pesawise class can be instantiated and used
+
+### Fixed
+- Issue with configuration not being properly loaded in some application setups
+
 ## [1.0.3] - 2024-09-26
 
 ### Changed

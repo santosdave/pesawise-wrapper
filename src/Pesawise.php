@@ -28,14 +28,14 @@ class Pesawise
 
     private function setConfig(array $config): void
     {
-        $this->config = array_merge([
-            'api_key' => null,
-            'api_secret' => null,
-            'environment' => 'sandbox',
-            'debug' => false,
-            'default_currency' => 'KES',
-            'default_balance_id' => null,
-        ], $config);
+        $this->config = [
+            'api_key' => $config['api_key'] ?? config('pesawise.api_key') ?? env('PESAWISE_API_KEY'),
+            'api_secret' => $config['api_secret'] ?? config('pesawise.api_secret') ?? env('PESAWISE_API_SECRET'),
+            'environment' => $config['environment'] ?? config('pesawise.environment') ?? env('PESAWISE_ENVIRONMENT', 'sandbox'),
+            'debug' => $config['debug'] ?? config('pesawise.debug') ?? env('PESAWISE_DEBUG', false),
+            'default_currency' => $config['default_currency'] ?? config('pesawise.default_currency') ?? env('PESAWISE_DEFAULT_CURRENCY', 'KES'),
+            'default_balance_id' => $config['default_balance_id'] ?? config('pesawise.default_balance_id') ?? env('PESAWISE_DEFAULT_BALANCE_ID'),
+        ];
 
         $this->validateConfig();
         $this->baseUrl = $this->config['environment'] === 'sandbox' ? self::SANDBOX_HOST : self::PROD_HOST;
