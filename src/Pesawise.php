@@ -6,6 +6,11 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Facades\Log;
 use InvalidArgumentException;
+use Santosdave\PesawiseWrapper\DataTypes\BulkPayment;
+use Santosdave\PesawiseWrapper\DataTypes\Currency;
+use Santosdave\PesawiseWrapper\DataTypes\CustomerData;
+use Santosdave\PesawiseWrapper\DataTypes\PaymentStatus;
+use Santosdave\PesawiseWrapper\DataTypes\TransferType;
 use Santosdave\PesawiseWrapper\Exceptions\PesawiseException;
 use Santosdave\PesawiseWrapper\Traits\ValidationTrait;
 
@@ -78,25 +83,47 @@ class Pesawise
         return $this->makeRequest('POST', '/api/payments/bank-recipient', $data);
     }
 
-    public function createBulkPayment(array $data): array
+    public function createBulkPayment(int $balanceId, Currency $currency, array $bulkPayments): array
     {
-        $this->validateRequired($data, ['balanceId', 'currency', 'bulkPayments']);
-        $this->validateNumeric($data, ['balanceId']);
-        $this->validateString($data, ['currency']);
-
-        foreach ($data['bulkPayments'] as $payment) {
-            $this->validateRequired($payment, ['amount', 'transferType', 'reference', 'recipient']);
-            $this->validateNumeric($payment, ['amount']);
-            $this->validateString($payment, ['transferType', 'reference', 'recipient']);
-            $this->validateEnum($payment, 'transferType', ['BANK', 'B2B', 'B2C', 'BUSINESS_PAY_BILL', 'BUSINESS_BUY_GOODS', 'COUNTER_PARTY_TRANSFER']);
-        }
+        $data = [
+            'balanceId' => $balanceId,
+            'currency' => $currency->getCode(),
+            'bulkPayments' => array_map(function (BulkPayment $payment) {
+                return $payment->toArray();
+            }, $bulkPayments),
+        ];
 
         return $this->makeRequest('POST', '/api/payments/bulk-payment', $data);
     }
 
-    public function createPaymentOrder(array $data): array
-    {
-        return $this->makeRequest('POST', '/api/e-com/create-order', $data);
+    public function createPaymentOrder(
+        float $amount,
+        string $customerName,
+        Currency $currency,
+        string $externalId,
+        string $description,
+        int $balanceId,
+        string $callbackUrl,
+        CustomerData $customerData,
+        ?string $cancellationUrl = null,
+        ?string $notificationId = null,
+        ?int $timeValidityMinutes = null
+    ): array {
+        $data = [
+            'amount' => $amount,
+            'customerName' => $customerName,
+            'currency' => $currency->getCode(),
+            'externalId' => $externalId,
+            'description' => $description,
+            'balanceId' => $balanceId,
+            'callbackUrl' => $callbackUrl,
+            'customerData' => $customerData->toArray(),
+            'cancellationUrl' => $cancellationUrl,
+            'notificationId' => $notificationId,
+            'timeValidityMinutes' => $timeValidityMinutes,
+        ];
+
+        return $this->makeRequest('POST', '/api/e-com/create-order', array_filter($data));
     }
 
     public function completePayment(array $data): array
@@ -104,14 +131,28 @@ class Pesawise
         return $this->makeRequest('POST', '/api/payments/complete-payment', $data);
     }
 
-    public function createDirectPayment(array $data): array
-    {
-        $this->validateRequired($data, ['balanceId', 'currency', 'amount', 'transferType', 'reference', 'recipient']);
-        $this->validateNumeric($data, ['balanceId', 'amount']);
-        $this->validateString($data, ['currency', 'transferType', 'reference', 'recipient']);
-        $this->validateEnum($data, 'transferType', ['BANK', 'B2B', 'B2C', 'BUSINESS_PAY_BILL', 'BUSINESS_BUY_GOODS', 'COUNTER_PARTY_TRANSFER']);
+    public function createDirectPayment(
+        int $balanceId,
+        Currency $currency,
+        float $amount,
+        TransferType $transferType,
+        string $reference,
+        string $recipient,
+        ?int $bankId = null,
+        ?string $accountNumber = null
+    ): array {
+        $data = [
+            'balanceId' => $balanceId,
+            'currency' => $currency->getCode(),
+            'amount' => $amount,
+            'transferType' => $transferType->getType(),
+            'reference' => $reference,
+            'recipient' => $recipient,
+            'bankId' => $bankId,
+            'accountNumber' => $accountNumber,
+        ];
 
-        return $this->makeRequest('POST', '/api/payments/create-direct-payment', $data);
+        return $this->makeRequest('POST', '/api/payments/create-direct-payment', array_filter($data));
     }
 
     public function createWallet(array $data): array
@@ -146,7 +187,7 @@ class Pesawise
         return $this->makeRequest('POST', '/api/payments/get-fee', $data);
     }
 
-    public function getPaymentStatus(string $paymentId = null, string $uniqueReference = null): array
+    public function getPaymentStatus(string $paymentId = null, string $uniqueReference = null): PaymentStatus
     {
         $params = [];
         if ($paymentId) {
@@ -157,7 +198,8 @@ class Pesawise
             throw new InvalidArgumentException('Either paymentId or uniqueReference must be provided');
         }
 
-        return $this->makeRequest('GET', "/api/payments/payment-status", $params);
+        $response = $this->makeRequest('GET', "/api/payments/payment-status", $params);
+        return new PaymentStatus($response['paymentStatus']);
     }
 
     public function getTransactions(int $walletId, bool $isVirtual, int $pageSize = 10, int $pageNumber = 1): array
