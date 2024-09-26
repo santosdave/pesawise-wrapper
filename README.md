@@ -76,29 +76,41 @@ $banks = Pesawise::getAllSupportedBanks();
 
 #### Validate Bank Recipient
 ```php
-$recipient = Pesawise::validateBankRecipient([
-    'bankId' => 1,
-    'bankAccountNumber' => '1234567890'
-]);
+use Santosdave\PesawiseWrapper\Requests\BankRecipientValidationRequest;
+
+$request = new BankRecipientValidationRequest(
+    bankId: 1,
+    bankAccountNumber: '1234567890'
+);
+
+$recipient = Pesawise::validateBankRecipient($request);
 ```
 
 #### Create Bulk Payment
 ```php
-$bulkPayment = Pesawise::createBulkPayment([
-    'balanceId' => 1001002,
-    'currency' => 'KES',
-    'bulkPayments' => [
-        [
-            'amount' => 1000,
-            'transferType' => 'BANK',
-            'phoneNumber' => '254712345678',
-            'reference' => 'REF123',
-            'recipient' => 'John Doe',
-            'bankId' => 1,
-            'accountNumber' => '1234567890'
-        ]
-    ]
-]);
+use Santosdave\PesawiseWrapper\Requests\BulkPaymentRequest;
+use Santosdave\PesawiseWrapper\DataTypes\Currency;
+use Santosdave\PesawiseWrapper\DataTypes\BulkPayment;
+use Santosdave\PesawiseWrapper\DataTypes\TransferType;
+
+$bulkPayments = [
+    new BulkPayment(
+        amount: 1000,
+        transferType: new TransferType(TransferType::BANK),
+        reference: 'REF123',
+        recipient: 'John Doe',
+        bankId: 1,
+        accountNumber: '1234567890'
+    )
+];
+
+$request = new BulkPaymentRequest(
+    balanceId: 1001002,
+    currency: new Currency(Currency::KES),
+    bulkPayments: $bulkPayments
+);
+
+$bulkPayment = Pesawise::createBulkPayment($request);
 ```
 
 #### Create Payment Order
@@ -116,10 +128,14 @@ $order = Pesawise::createPaymentOrder([
 
 #### Complete Payment
 ```php
-$payment = Pesawise::completePayment([
-    'paymentId' => 'payment_id_here',
-    'otp' => '123456'
-]);
+use Santosdave\PesawiseWrapper\Requests\CompletePaymentRequest;
+
+$request = new CompletePaymentRequest(
+    paymentId: 'payment_id_here',
+    otp: '123456'
+);
+
+$payment = Pesawise::completePayment($request);
 ```
 
 #### Create Direct Payment
@@ -177,15 +193,3 @@ If you discover any security related issues, please email the author instead of 
 
 The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
 
-pesawise-wrapper/
-├── src/
-│   ├── Exceptions/
-│   │   └── PesawiseException.php
-│   ├── Traits/
-│   │   └── ValidationTrait.php
-│   ├── Pesawise.php
-│   └── PesawiseProvider.php
-├── tests/
-│   ├── PesawiseProviderTest.php
-│   └── PesawiseTest.php
-└── composer.json

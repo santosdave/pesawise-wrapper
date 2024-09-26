@@ -7,6 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.0] - 2024-09-29
+
+### Added
+- New request classes for all Pesawise API endpoints:
+  - `BankRecipientValidationRequest`
+  - `BulkPaymentRequest`
+  - `CompletePaymentRequest`
+  - `CreatePaymentOrderRequest`
+  - `CreateWalletRequest`
+  - `DirectPaymentRequest`
+  - `GetPaymentFeeRequest`
+  - `MpesaPaymentRequest`
+  - `PesalinkPaymentRequest`
+  - `ResendOtpRequest`
+  - `StkPushRequest`
+- Updated `BulkPayment` data type to include all fields specified in the API documentation
+- Enhanced `TransferType` class with all possible transfer types
+
+### Changed
+- Updated `Pesawise` class to use new request classes for all API calls
+- Improved validation logic in `ValidationTrait`
+- Enhanced type safety and parameter validation across all classes
+
 ## [1.2.1] - 2024-09-28
 
 ### Added

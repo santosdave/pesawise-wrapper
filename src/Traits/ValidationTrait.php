@@ -40,4 +40,30 @@ trait ValidationTrait
             throw new InvalidArgumentException("The {$field} must be one of: {$allowedValuesString}.");
         }
     }
+
+    protected function validateEnumValue(string $field, $value, array $allowedValues): void
+    {
+        if (!in_array($value, $allowedValues)) {
+            $allowedValuesString = implode(', ', $allowedValues);
+            throw new InvalidArgumentException("The {$field} must be one of: {$allowedValuesString}.");
+        }
+    }
+
+    protected function validateUrl(array $fields, array $values): void
+    {
+        foreach ($fields as $index => $field) {
+            if (isset($values[$index]) && !filter_var($values[$index], FILTER_VALIDATE_URL)) {
+                throw new InvalidArgumentException("The {$field} must be a valid URL.");
+            }
+        }
+    }
+
+    protected function validatePhone(array $fields, array $values): void
+    {
+        foreach ($fields as $index => $field) {
+            if (isset($values[$index]) && !preg_match('/^\+?[1-9]\d{1,14}$/', $values[$index])) {
+                throw new InvalidArgumentException("The {$field} must be a valid phone number.");
+            }
+        }
+    }
 }

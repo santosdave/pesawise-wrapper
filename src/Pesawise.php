@@ -6,12 +6,19 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Facades\Log;
 use InvalidArgumentException;
-use Santosdave\PesawiseWrapper\DataTypes\BulkPayment;
-use Santosdave\PesawiseWrapper\DataTypes\Currency;
-use Santosdave\PesawiseWrapper\DataTypes\CustomerData;
 use Santosdave\PesawiseWrapper\DataTypes\PaymentStatus;
-use Santosdave\PesawiseWrapper\DataTypes\TransferType;
 use Santosdave\PesawiseWrapper\Exceptions\PesawiseException;
+use Santosdave\PesawiseWrapper\Requests\BankRecipientValidationRequest;
+use Santosdave\PesawiseWrapper\Requests\BulkPaymentRequest;
+use Santosdave\PesawiseWrapper\Requests\CompletePaymentRequest;
+use Santosdave\PesawiseWrapper\Requests\CreatePaymentOrderRequest;
+use Santosdave\PesawiseWrapper\Requests\CreateWalletRequest;
+use Santosdave\PesawiseWrapper\Requests\DirectPaymentRequest;
+use Santosdave\PesawiseWrapper\Requests\GetPaymentFeeRequest;
+use Santosdave\PesawiseWrapper\Requests\MpesaPaymentRequest;
+use Santosdave\PesawiseWrapper\Requests\PesalinkPaymentRequest;
+use Santosdave\PesawiseWrapper\Requests\ResendOtpRequest;
+use Santosdave\PesawiseWrapper\Requests\StkPushRequest;
 use Santosdave\PesawiseWrapper\Traits\ValidationTrait;
 
 class Pesawise
@@ -78,86 +85,85 @@ class Pesawise
         return $this->makeRequest('POST', '/api/payments/get-bank-info');
     }
 
-    public function validateBankRecipient(array $data): array
+    /**
+     * Validate a bank recipient
+     *
+     * @param BankRecipientValidationRequest $request
+     * @return array
+     * @throws PesawiseException
+     */
+
+    public function validateBankRecipient(BankRecipientValidationRequest $request): array
     {
-        return $this->makeRequest('POST', '/api/payments/bank-recipient', $data);
+        $request->validate();
+        return $this->makeRequest('POST', '/api/payments/bank-recipient', $request->toArray());
     }
 
-    public function createBulkPayment(int $balanceId, Currency $currency, array $bulkPayments): array
+    /**
+     * Create a bulk payment
+     *
+     * @param BulkPaymentRequest $request
+     * @return array
+     * @throws PesawiseException
+     */
+    public function createBulkPayment(BulkPaymentRequest $request): array
     {
-        $data = [
-            'balanceId' => $balanceId,
-            'currency' => $currency->getCode(),
-            'bulkPayments' => array_map(function (BulkPayment $payment) {
-                return $payment->toArray();
-            }, $bulkPayments),
-        ];
-
-        return $this->makeRequest('POST', '/api/payments/bulk-payment', $data);
+        $request->validate();
+        return $this->makeRequest('POST', '/api/payments/bulk-payment', $request->toArray());
     }
 
-    public function createPaymentOrder(
-        float $amount,
-        string $customerName,
-        Currency $currency,
-        string $externalId,
-        string $description,
-        int $balanceId,
-        string $callbackUrl,
-        CustomerData $customerData,
-        ?string $cancellationUrl = null,
-        ?string $notificationId = null,
-        ?int $timeValidityMinutes = null
-    ): array {
-        $data = [
-            'amount' => $amount,
-            'customerName' => $customerName,
-            'currency' => $currency->getCode(),
-            'externalId' => $externalId,
-            'description' => $description,
-            'balanceId' => $balanceId,
-            'callbackUrl' => $callbackUrl,
-            'customerData' => $customerData->toArray(),
-            'cancellationUrl' => $cancellationUrl,
-            'notificationId' => $notificationId,
-            'timeValidityMinutes' => $timeValidityMinutes,
-        ];
-
-        return $this->makeRequest('POST', '/api/e-com/create-order', array_filter($data));
-    }
-
-    public function completePayment(array $data): array
+    /**
+     * Create a payment order
+     *
+     * @param CreatePaymentOrderRequest $request
+     * @return array
+     * @throws PesawiseException
+     */
+    public function createPaymentOrder(CreatePaymentOrderRequest $request): array
     {
-        return $this->makeRequest('POST', '/api/payments/complete-payment', $data);
+        $request->validate();
+        return $this->makeRequest('POST', '/api/e-com/create-order', $request->toArray());
     }
 
-    public function createDirectPayment(
-        int $balanceId,
-        Currency $currency,
-        float $amount,
-        TransferType $transferType,
-        string $reference,
-        string $recipient,
-        ?int $bankId = null,
-        ?string $accountNumber = null
-    ): array {
-        $data = [
-            'balanceId' => $balanceId,
-            'currency' => $currency->getCode(),
-            'amount' => $amount,
-            'transferType' => $transferType->getType(),
-            'reference' => $reference,
-            'recipient' => $recipient,
-            'bankId' => $bankId,
-            'accountNumber' => $accountNumber,
-        ];
 
-        return $this->makeRequest('POST', '/api/payments/create-direct-payment', array_filter($data));
-    }
-
-    public function createWallet(array $data): array
+    /**
+     * Complete a payment
+     *
+     * @param CompletePaymentRequest $request
+     * @return array
+     * @throws PesawiseException
+     */
+    public function completePayment(CompletePaymentRequest $request): array
     {
-        return $this->makeRequest('POST', '/api/payments/create-balance', $data);
+        $request->validate();
+        return $this->makeRequest('POST', '/api/payments/complete-payment', $request->toArray());
+    }
+
+    /**
+     * Create a direct payment
+     *
+     * @param DirectPaymentRequest $request
+     * @return array
+     * @throws PesawiseException
+     */
+
+    public function createDirectPayment(DirectPaymentRequest $request): array
+    {
+        $request->validate();
+        return $this->makeRequest('POST', '/api/payments/create-direct-payment', $request->toArray());
+    }
+
+    /**
+     * Create a new wallet
+     *
+     * @param CreateWalletRequest $request
+     * @return array
+     * @throws PesawiseException
+     */
+    public function createWallet(CreateWalletRequest $request): array
+    {
+        $request->validate();
+        return $this->makeRequest('POST', '/api/payments/create-balance', $request->toArray());
     }
 
     public function getWallet(int $walletId, bool $isVirtual = false): array
@@ -182,9 +188,18 @@ class Pesawise
         ]);
     }
 
-    public function getPaymentFee(array $data): array
+    /**
+     * Get the fee for a payment
+     *
+     * @param GetPaymentFeeRequest $request
+     * @return array
+     * @throws PesawiseException
+     */
+
+    public function getPaymentFee(GetPaymentFeeRequest $request): array
     {
-        return $this->makeRequest('POST', '/api/payments/get-fee', $data);
+        $request->validate();
+        return $this->makeRequest('POST', '/api/payments/get-fee', $request->toArray());
     }
 
     public function getPaymentStatus(string $paymentId = null, string $uniqueReference = null): PaymentStatus
@@ -212,28 +227,60 @@ class Pesawise
         ]);
     }
 
-    public function createMpesaPayment(array $data, bool $isVirtual = false): array
+    /**
+     * Create an M-PESA payment
+     *
+     * @param MpesaPaymentRequest $request
+     * @param bool $isVirtual
+     * @return array
+     * @throws PesawiseException
+     */
+    public function createMpesaPayment(MpesaPaymentRequest $request, bool $isVirtual = false): array
     {
-        $this->validateRequired($data, ['amount', 'phoneNumber', 'balanceId', 'reference', 'recipient']);
-        $this->validateNumeric($data, ['amount', 'balanceId']);
-        $this->validateString($data, ['phoneNumber', 'reference', 'recipient']);
-
-        return $this->makeRequest('POST', "/api/payments/mpesa-payment", array_merge($data, ['is-virtual' => $isVirtual]));
+        $request->validate();
+        $data = array_merge($request->toArray(), ['is-virtual' => $isVirtual]);
+        return $this->makeRequest('POST', '/api/payments/mpesa-payment', $data);
     }
 
-    public function createPesalinkPayment(array $data, bool $isVirtual = false): array
+    /**
+     * Create a Pesalink payment
+     *
+     * @param PesalinkPaymentRequest $request
+     * @param bool $isVirtual
+     * @return array
+     * @throws PesawiseException
+     */
+    public function createPesalinkPayment(PesalinkPaymentRequest $request, bool $isVirtual = false): array
     {
-        return $this->makeRequest('POST', "/api/payments/pesalink-payment", array_merge($data, ['is-virtual' => $isVirtual]));
+        $request->validate();
+        $data = array_merge($request->toArray(), ['is-virtual' => $isVirtual]);
+        return $this->makeRequest('POST', '/api/payments/pesalink-payment', $data);
     }
 
-    public function resendOtp(array $data): array
+    /**
+     * Resend OTP for a payment
+     *
+     * @param ResendOtpRequest $request
+     * @return array
+     * @throws PesawiseException
+     */
+    public function resendOtp(ResendOtpRequest $request): array
     {
-        return $this->makeRequest('POST', '/api/payments/resend-otp', $data);
+        $request->validate();
+        return $this->makeRequest('POST', '/api/payments/resend-otp', $request->toArray());
     }
 
-    public function stkPush(array $data): array
+    /**
+     * Initiate an STK push
+     *
+     * @param StkPushRequest $request
+     * @return array
+     * @throws PesawiseException
+     */
+    public function stkPush(StkPushRequest $request): array
     {
-        return $this->makeRequest('POST', '/api/payments/stk-push', $data);
+        $request->validate();
+        return $this->makeRequest('POST', '/api/payments/stk-push', $request->toArray());
     }
 
     protected function makeRequest(string $method, string $endpoint, array $data = []): array
