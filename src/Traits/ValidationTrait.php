@@ -6,10 +6,11 @@ use InvalidArgumentException;
 
 trait ValidationTrait
 {
-    protected function validateRequired(array $data, array $required)
+
+    protected function validateRequired(array $fields, array $values)
     {
-        foreach ($required as $field) {
-            if (!isset($data[$field]) || empty($data[$field])) {
+        foreach ($fields as $index => $field) {
+            if (!isset($values[$index]) || empty($values[$index])) {
                 throw new InvalidArgumentException("The {$field} field is required.");
             }
         }
@@ -24,10 +25,10 @@ trait ValidationTrait
         }
     }
 
-    protected function validateString(array $data, array $fields)
+    protected function validateString(array $fields, array $values)
     {
-        foreach ($fields as $field) {
-            if (isset($data[$field]) && !is_string($data[$field])) {
+        foreach ($fields as $index => $field) {
+            if (isset($values[$index]) && !is_string($values[$index])) {
                 throw new InvalidArgumentException("The {$field} must be a string.");
             }
         }
